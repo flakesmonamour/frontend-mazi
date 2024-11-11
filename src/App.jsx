@@ -7,6 +7,9 @@ import RegisterPage from './pages/RegisterPage';
 import DonationPage from './pages/DonationPage';
 import AboutPage from './pages/AboutPage';
 import ImpactPage from './pages/ImpactPage';
+import OrganizationProfileForm from './pages/OrganizationProfileForm.js';
+import PostStoryPage from './pages/PostStoryPage';
+import ManageBeneficiariesPage from './pages/ManageBeneficiariesPage';
 import PrivateRoute from './components/PrivateRoute';
 
 function App() {
@@ -21,11 +24,40 @@ function App() {
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/about" element={<AboutPage />} />
             <Route path="/impact" element={<ImpactPage />} />
+            <Route path="/post-story" element={<PostStoryPage />} />
+            <Route
+              path="/beneficiary-list"
+              element={<ManageBeneficiariesPage/>} />
             <Route
               path="/donate"
               element={
                 <PrivateRoute>
                   <DonationPage />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/organization-profile"
+              element={
+                <PrivateRoute>
+                  <OrganizationProfileForm />
+                </PrivateRoute>
+              }
+            />
+            {/* Test without PrivateRoute if needed */}
+            <Route
+              path="/post-story"
+              element={
+                <PrivateRoute>
+                  <PostStoryPage />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/manage-beneficiaries"
+              element={
+                <PrivateRoute>
+                  <ManageBeneficiariesPage />
                 </PrivateRoute>
               }
             />
