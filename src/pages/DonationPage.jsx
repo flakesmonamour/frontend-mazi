@@ -2,14 +2,14 @@ import { useState } from 'react';
 import DonationForm from '../components/DonationForm';
 
 function DonationPage() {
-  const [selectedAmount, setSelectedAmount] = useState(25);
+  const [selectedAmount, setSelectedAmount] = useState(2500); // default in Ksh
   const [frequency, setFrequency] = useState('monthly');
 
   const donationOptions = [
-    { amount: 10, description: 'Plants 20 trees in affected areas' },
-    { amount: 25, description: 'Protects 1 acre of rainforest' },
-    { amount: 50, description: 'Funds water conservation projects' },
-    { amount: 100, description: 'Supports wildlife preservation' },
+    { amount: 1000, description: 'Plants 20 trees in affected areas' },
+    { amount: 2500, description: 'Protects 1 acre of rainforest' },
+    { amount: 5000, description: 'Funds water conservation projects' },
+    { amount: 10000, description: 'Supports wildlife preservation' },
   ];
 
   return (
@@ -37,7 +37,8 @@ function DonationPage() {
                     : 'border-gray-200'
                 }`}
               >
-                <div className="text-xl font-bold text-green-600">${option.amount}</div>
+                {/* Display amount in Ksh */}
+                <div className="text-xl font-bold text-green-600">Ksh {option.amount}</div>
                 <div className="text-sm text-gray-600">{option.description}</div>
               </button>
             ))}

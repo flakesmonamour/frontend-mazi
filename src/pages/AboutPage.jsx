@@ -35,6 +35,7 @@ function AboutPage() {
             </p>
           </div>
         </div>
+        
 
         <div className="space-y-6">
           <div>
@@ -82,6 +83,7 @@ function AboutPage() {
                   the fight for our planet's well-being.
                 </p>
               </div>
+              
             )}
           </div>
         </div>

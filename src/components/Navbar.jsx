@@ -1,24 +1,26 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { logout } from '../store/slices/authSlice';
+import { useState } from 'react';
 
 function Navbar() {
   const { isAuthenticated, user } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
-  const navigate = useNavigate(); // Hook to programmatically navigate
+  const navigate = useNavigate();
+
+  const [isDropdownOpen, setDropdownOpen] = useState(false);
 
   const handleLogout = () => {
     dispatch(logout());
-    navigate('/login'); // Redirect to the login page after logout
+    navigate('/login');
   };
 
-  // Log user object to verify role
-  console.log(user);
+  const toggleDropdown = () => {
+    setDropdownOpen((prev) => !prev);
+  };
 
-  // Helper function to render role-specific links
   const renderRoleLinks = () => {
     if (user?.role === 'admin') {
-      // Links for Admin
       return (
         <>
           <Link to="/review-applications" className="text-gray-600 hover:text-gray-900">
@@ -28,7 +30,6 @@ function Navbar() {
         </>
       );
     } else if (user?.role === 'organization') {
-      // Links for Environmental Organizations
       return (
         <>
           <Link to="/apply-organization" className="text-gray-600 hover:text-gray-900">
@@ -49,13 +50,31 @@ function Navbar() {
         </>
       );
     } else {
-      // Links for Donors or General Users
       return (
         <>
-          <Link to="/donate" className="text-gray-600 hover:text-gray-900">Donate to an Organization</Link>
+          <div className="relative">
+            <button onClick={toggleDropdown} className="text-gray-600 hover:text-gray-900">
+              Donate to an Organization
+            </button>
+            {isDropdownOpen && (
+              <div className="absolute left-0 mt-2 w-48 bg-white shadow-lg rounded-md py-2 z-10">
+                <Link to="/donate" className="block px-4 py-2 text-gray-600 hover:bg-gray-100">
+                  Donate to an Organization
+                </Link>
+                <Link to="/organization-profile" className="block px-4 py-2 text-gray-600 hover:bg-gray-100">
+                  Organization Profile
+                </Link>
+                <Link to="/post-story" className="block px-4 py-2 text-gray-600 hover:bg-gray-100">
+                  Post a Story
+                </Link>
+                <Link to="/beneficiary-list" className="block px-4 py-2 text-gray-600 hover:bg-gray-100">
+                  Beneficiaries & Inventory
+                </Link>
+              </div>
+            )}
+          </div>
           <Link to="/impact" className="text-gray-600 hover:text-gray-900">Impact</Link>
           <Link to="/about" className="text-gray-600 hover:text-gray-900">About</Link>
-          
         </>
       );
     }

@@ -4,9 +4,6 @@ import { useState } from 'react';
 
 function DonationForm({ amount, frequency }) {
   const [paymentMethod, setPaymentMethod] = useState('');
-  const [isAnonymous, setIsAnonymous] = useState(false);
-  const [reminderFrequency, setReminderFrequency] = useState('monthly');
-  const [receiveStories, setReceiveStories] = useState(false);
 
   const formik = useFormik({
     initialValues: {
@@ -22,10 +19,7 @@ function DonationForm({ amount, frequency }) {
       paypalEmail: '',
     },
     validationSchema: Yup.object({
-      fullName: Yup.string().when('isAnonymous', {
-        is: false,
-        then: Yup.string().required('Full name is required'),
-      }),
+      fullName: Yup.string().required('Required'),
       email: Yup.string().email('Invalid email').required('Required'),
       phoneNumber: Yup.string().when('paymentMethod', {
         is: 'mpesa',
@@ -51,6 +45,7 @@ function DonationForm({ amount, frequency }) {
         is: 'paypal',
         then: Yup.string().email('Invalid email').required('Required'),
       }),
+      // Additional validation for credit card, Stripe, etc.
     }),
     onSubmit: (values) => {
       console.log('Form submitted:', values);
@@ -68,25 +63,21 @@ function DonationForm({ amount, frequency }) {
       <h2 className="text-xl font-semibold mb-6">Complete Your Donation</h2>
       
       <div className="space-y-4">
-        {/* Full Name */}
-        {!isAnonymous && (
-          <div>
-            <label htmlFor="fullName" className="block text-sm font-medium text-gray-700">
-              Full Name
-            </label>
-            <input
-              id="fullName"
-              type="text"
-              {...formik.getFieldProps('fullName')}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
-            />
-            {formik.touched.fullName && formik.errors.fullName && (
-              <div className="text-red-600 text-sm">{formik.errors.fullName}</div>
-            )}
-          </div>
-        )}
+        <div>
+          <label htmlFor="fullName" className="block text-sm font-medium text-gray-700">
+            Full Name
+          </label>
+          <input
+            id="fullName"
+            type="text"
+            {...formik.getFieldProps('fullName')}
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
+          />
+          {formik.touched.fullName && formik.errors.fullName && (
+            <div className="text-red-600 text-sm">{formik.errors.fullName}</div>
+          )}
+        </div>
 
-        {/* Email Address */}
         <div>
           <label htmlFor="email" className="block text-sm font-medium text-gray-700">
             Email Address
@@ -102,7 +93,6 @@ function DonationForm({ amount, frequency }) {
           )}
         </div>
 
-        {/* Payment Method */}
         <div>
           <label htmlFor="paymentMethod" className="block text-sm font-medium text-gray-700">
             Payment Method
@@ -116,13 +106,14 @@ function DonationForm({ amount, frequency }) {
           >
             <option value="">Select Payment Method</option>
             <option value="creditCard">Credit Card</option>
+            <option value="debitCard">Debit Card</option>
             <option value="mpesa">MPESA</option>
             <option value="paypal">PayPal</option>
+
           </select>
         </div>
 
-        {/* Conditional Payment Inputs */}
-        {paymentMethod === 'creditCard' && (
+        {paymentMethod === 'creditCard' || paymentMethod === 'debitCard' ? (
           <>
             <div>
               <label htmlFor="cardNumber" className="block text-sm font-medium text-gray-700">
@@ -140,7 +131,6 @@ function DonationForm({ amount, frequency }) {
               )}
             </div>
 
-            {/* Expiry Date */}
             <div>
               <label htmlFor="expiryDate" className="block text-sm font-medium text-gray-700">
                 Expiry Date (MM/YY)
@@ -157,7 +147,6 @@ function DonationForm({ amount, frequency }) {
               )}
             </div>
 
-            {/* CVC */}
             <div>
               <label htmlFor="cvc" className="block text-sm font-medium text-gray-700">
                 CVC
@@ -174,9 +163,10 @@ function DonationForm({ amount, frequency }) {
               )}
             </div>
           </>
-        )}
+        ) : null}
 
-        {/* MPESA */}
+
+        {/* Conditional Inputs for Each Payment Method */}
         {paymentMethod === 'mpesa' && (
           <>
             <div>
@@ -212,8 +202,6 @@ function DonationForm({ amount, frequency }) {
             </div>
           </>
         )}
-
-        {/* PayPal */}
         {paymentMethod === 'paypal' && (
           <div>
             <label htmlFor="paypalEmail" className="block text-sm font-medium text-gray-700">
@@ -232,54 +220,29 @@ function DonationForm({ amount, frequency }) {
           </div>
         )}
 
-        {/* Anonymous Donor */}
-        <div className="flex items-center">
-          <input
-            type="checkbox"
-            checked={isAnonymous}
-            onChange={() => setIsAnonymous(!isAnonymous)}
-            className="mr-2"
-          />
-          <label className="text-sm text-gray-700">Donate anonymously</label>
-        </div>
-
-        {/* Donation Reminder */}
-        <div>
-          <label htmlFor="reminderFrequency" className="block text-sm font-medium text-gray-700">
-            Set Reminder Frequency
-          </label>
-          <select
-            id="reminderFrequency"
-            value={reminderFrequency}
-            onChange={(e) => setReminderFrequency(e.target.value)}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
-          >
-            <option value="monthly">Monthly</option>
-            <option value="quarterly">Quarterly</option>
-            <option value="yearly">Yearly</option>
-          </select>
-        </div>
-
-        {/* Receive Stories */}
-        <div className="flex items-center">
-          <input
-            type="checkbox"
-            checked={receiveStories}
-            onChange={() => setReceiveStories(!receiveStories)}
-            className="mr-2"
-          />
-          <label className="text-sm text-gray-700">Receive beneficiary stories</label>
-        </div>
+        {/* Additional fields for Stripe or other payment methods */}
 
         <div className="mt-6">
-          <button
-            type="submit"
-            disabled={formik.isSubmitting}
-            className="w-full bg-green-500 text-white py-2 rounded-md shadow-lg hover:bg-green-600"
-          >
-            Donate {amount} {frequency}
-          </button>
+          <div className="flex justify-between mb-2">
+            <span>Amount</span>
+            <span>ksh{amount}</span>
+          </div>
+          <div className="flex justify-between mb-2">
+            <span>Frequency</span>
+            <span className="capitalize">{frequency}</span>
+          </div>
+          <div className="flex justify-between font-semibold">
+            <span>Total</span>
+            <span>ksh{amount}/{frequency === 'monthly' ? 'mo' : frequency === 'quarterly' ? 'quarter' : 'year'}</span>
+          </div>
         </div>
+
+        <button
+          type="submit"
+          className="w-full bg-green-500 text-white py-3 px-4 rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+        >
+          Complete Donation
+        </button>
       </div>
     </form>
   );
