@@ -5,14 +5,18 @@ const PostStoryPage = () => {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [imageUrl, setImageUrl] = useState('');
+  const [organization, setOrganization] = useState('');
   const [status, setStatus] = useState('');
   const [stories, setStories] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const storiesPerPage = 5;
 
   // Fetch stories function
   const fetchStories = async () => {
+    setLoading(true);
     try {
-      const response = await axios.get('/api/stories');
+      const response = await axios.get(`/api/stories?organization=${organization}&page=${currentPage}&limit=${storiesPerPage}`);
       if (Array.isArray(response.data)) {
         setStories(response.data);
       } else {
@@ -20,15 +24,16 @@ const PostStoryPage = () => {
       }
     } catch (error) {
       console.error('Error fetching stories:', error);
+      setStatus('Failed to fetch stories');
     } finally {
       setLoading(false);
     }
   };
 
-  // Fetch stories when the component mounts
+  // Fetch stories when the component mounts or currentPage changes
   useEffect(() => {
-    fetchStories();
-  }, []);
+    if (organization) fetchStories();
+  }, [organization, currentPage]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -38,6 +43,7 @@ const PostStoryPage = () => {
         title,
         content,
         image_url: imageUrl,
+        organization,
       });
       setStatus('Story posted successfully!');
       setTitle('');
@@ -56,12 +62,25 @@ const PostStoryPage = () => {
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
+            <label className="block text-lg font-medium text-gray-700">Organization Name</label>
+            <input
+              type="text"
+              value={organization}
+              onChange={(e) => setOrganization(e.target.value)}
+              required
+              placeholder="Enter your organization name"
+              className="w-full px-4 py-2 mt-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+            />
+          </div>
+
+          <div>
             <label className="block text-lg font-medium text-gray-700">Title</label>
             <input
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               required
+              placeholder="Enter story title"
               className="w-full px-4 py-2 mt-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
             />
           </div>
@@ -72,6 +91,7 @@ const PostStoryPage = () => {
               value={content}
               onChange={(e) => setContent(e.target.value)}
               required
+              placeholder="Enter story content"
               className="w-full px-4 py-2 mt-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
               rows="6"
             />
@@ -83,6 +103,7 @@ const PostStoryPage = () => {
               type="text"
               value={imageUrl}
               onChange={(e) => setImageUrl(e.target.value)}
+              placeholder="Enter image URL"
               className="w-full px-4 py-2 mt-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
             />
           </div>
@@ -95,10 +116,8 @@ const PostStoryPage = () => {
           </button>
         </form>
 
-        {/* Display status message */}
         {status && <p className="mt-4 text-center text-green-600 font-semibold">{status}</p>}
 
-        {/* Display Posted Stories */}
         <h3 className="text-2xl font-bold text-center text-green-700 mt-12 mb-6">Posted Stories</h3>
 
         {loading ? (
@@ -106,14 +125,12 @@ const PostStoryPage = () => {
         ) : (
           <div className="space-y-6">
             {stories.length === 0 ? (
-              <p className="text-center text-gray-600">No stories available.</p>
+              <p className="text-center text-gray-600">No stories available for this organization.</p>
             ) : (
               stories.map((story) => (
-                <div
-                  key={story.id}
-                  className="bg-white p-6 rounded-lg shadow-lg border border-gray-200 space-y-4"
-                >
+                <div key={story.id} className="bg-white p-6 rounded-lg shadow-lg border border-gray-200 space-y-4">
                   <h4 className="text-xl font-semibold text-green-600">{story.title}</h4>
+                  <p className="text-gray-500">by {story.organization}</p>
                   <p className="text-gray-700">{story.content}</p>
                   {story.image_url && (
                     <img
@@ -127,6 +144,23 @@ const PostStoryPage = () => {
             )}
           </div>
         )}
+
+        {/* Pagination controls */}
+        <div className="flex justify-center space-x-4 mt-8">
+          <button
+            disabled={currentPage === 1}
+            onClick={() => setCurrentPage((prev) => prev - 1)}
+            className="px-4 py-2 bg-green-500 text-white font-semibold rounded-md disabled:opacity-50"
+          >
+            Previous
+          </button>
+          <button
+            onClick={() => setCurrentPage((prev) => prev + 1)}
+            className="px-4 py-2 bg-green-500 text-white font-semibold rounded-md"
+          >
+            Next
+          </button>
+        </div>
       </div>
     </div>
   );

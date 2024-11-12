@@ -33,21 +33,15 @@ function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-green-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div
-        className="max-w-md w-full space-y-8 p-8 rounded-lg shadow-md"
-        style={{
-          backgroundImage: "url('/images/green-leaves-background.webp')",  // Make sure path is correct
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-        }}
-      >
+    <div
+      className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8"
+    >
+      <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-lg shadow-md bg-opacity-70">
         <div className="text-center">
           <h2 className="mt-6 text-3xl font-extrabold text-gray-900">Sign in to EcoGuard</h2>
           <p className="mt-2 text-sm text-gray-600">
             Or{' '}
-            <Link to="/register" className="font-medium text-white-600 hover:text-white-500">
+            <Link to="/register" className="font-medium text-green-600 hover:text-green-500">
               create a new account
             </Link>
           </p>
